@@ -5,7 +5,7 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font: 13px Helvetica, Arial; }
-        form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+        form { background: #000; padding: 3px; width: 100%; }
         form input { border: 0; padding: 10px; width: 85%; margin-right: .5%; }
         form button { width: 14%; background: rgb(130, 224, 255); border: none; padding: 10px;  }
         #messages { list-style-type: none; margin: 0; padding: 0; }
@@ -14,7 +14,11 @@
     </style>
 </head>
 <body>
+
 <ul id="messages"></ul>
+<form action="" id="partnerform">
+    <input id="partner" autocomplete="off" /><button>Set my partner</button>
+</form>
 <form action="" id="form">
     <input id="m" autocomplete="off" /><button>Send</button>
 </form>
@@ -22,17 +26,31 @@
 <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
 <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
 <script>
-
-    console.log('0');
+    var name = prompt('What is your name');
+    console.log(name);
     var socket = io();
 
     console.log('1');
-    $('form').submit(function(){
+    $('#partnerform').submit(function(){
+        console.log('set my partner');
+        socket.emit('set up my partner', $('#partner').val());
+        return false;
+    });
+
+    $('#form').submit(function(){
         console.log('xxx');
         socket.emit('chat message', $('#m').val());
         $('#m').val('');
         return false;
     });
+
+    socket.on('chat message', function(msg){
+        $('#messages').append($('<li>').text(msg));
+    });
+
+    socket.on('get your name', function (incoming) {
+        socket.emit('register my account', {name: name})
+    })
 </script>
 </body>
 </html>
